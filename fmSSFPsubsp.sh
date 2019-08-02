@@ -77,7 +77,7 @@ if [ ! -e $TOOLBOX_PATH/bart ] ; then
 	exit 1
 fi
 
-WORKDIR=$(mktemp -d)
+#WORKDIR=$(mktemp -d)
 # Mac: http://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x
 WORKDIR=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 trap 'rm -rf "$WORKDIR"' EXIT
@@ -94,7 +94,6 @@ export COILS=$(bart show -d3 $meas)
 bart cc -p$VCOILS -A -S $meas meas_cc
 
 # create trajectory 
-
 if [ $GA -gt 0 ] ; then
     echo "Golden Angle trajectory" >&2
     bart traj -r -G -c -x$READ -y$SPOKES traj 
@@ -104,7 +103,6 @@ else
     bart repmat 3 $P traj_st traj_f
     bart reshape $(bitmask 2 3) $SPOKES 1 traj_f traj
 fi
-
 
 # apply inverse nufft to full data set
 bart nufft -i -d$READ:$READ:1 traj meas_cc img
