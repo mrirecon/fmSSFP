@@ -2,7 +2,8 @@
 # 2019 Volkert Roeloffs <vroeloffs@berkeley.edu>
 #
 # Subspace-constrained reconstruction of fmSSFP data
-#
+# This script is derived from the grasp.sh script of the BART toolbox.
+# See the LICENSE file for copyright information.
 set -e
 
 # default settings
