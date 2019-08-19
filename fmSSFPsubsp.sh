@@ -102,7 +102,7 @@ else
     echo "Turn-based trajectory" >&2
     bart traj -r -c -D -x$READ -y$(($SPOKES / $P)) traj_st
     bart repmat 3 $P traj_st traj_f
-    bart reshape $(bitmask 2 3) $SPOKES 1 traj_f traj
+    bart reshape $(bart bitmask 2 3) $SPOKES 1 traj_f traj
 fi
 
 # apply inverse nufft to full data set
