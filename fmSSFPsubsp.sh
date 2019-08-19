@@ -127,9 +127,13 @@ bart delta 16 $(bart bitmask 2 5) $SPOKES pattern
 bart fmac meas_cc pattern meas_t
 bart repmat 1 $READ pattern pattern_full
 
+# transform data
+bart transpose 2 5 meas_cc meas_t
+bart transpose 2 5 traj traj_t
+
 # reconstruction with subspace constraint
 bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV \
-    -t traj -B basis -p pattern_full meas_t sens reco
+    -t traj_t -B basis meas_t sens reco
 
 #crop to actual FoV and combine coefficients with RSS
 size=$(bc -l <<< "0.5 * $READ")
