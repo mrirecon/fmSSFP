@@ -1,5 +1,6 @@
 #!/bin/bash
 # 2019 Volkert Roeloffs <vroeloffs@berkeley.edu>
+# 2019 Martin Uecker <martin.uecker@med.uni-goettingen.de>
 #
 # Subspace-constrained reconstruction of fmSSFP data
 # This script is derived from the grasp.sh script of the BART toolbox.
@@ -17,7 +18,7 @@ GA=1 #0: turn-based sampling, 1: Golden Angle sampling
 P=4
 LOGFILE=/dev/stdout
 title=$(cat <<- EOF
-	BART-based fmSSFP reco v0.1
+	BART-based fmSSFP reco v0.2
 EOF
 )
 
