@@ -142,9 +142,6 @@ bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV \
 #combine coefficients with RSS
 bart rss $(bart bitmask 6) reco $output
 
-#write out reconstruction as png
-bart toimg -W $output $output
-
 } > $LOGFILE
 
 exit 0
