@@ -1,5 +1,6 @@
 #!/bin/bash
 # 2019 Volkert Roeloffs <vroeloffs@berkeley.edu>
+# 2019 Martin Uecker <martin.uecker@med.uni-goettingen.de>
 #
 # Subspace-constrained reconstruction of fmSSFP data
 # This script is derived from the grasp.sh script of the BART toolbox.
@@ -12,12 +13,12 @@ export VCOILS=10
 export REG=0.0005
 export LLRBLK=8
 export ITER=100
-export FOV=0.5
+export FOV=1.
 GA=1 #0: turn-based sampling, 1: Golden Angle sampling
 P=4
 LOGFILE=/dev/stdout
 title=$(cat <<- EOF
-	BART-based fmSSFP reco v0.1
+	BART-based fmSSFP reco v0.2
 EOF
 )
 
@@ -87,9 +88,9 @@ cd $WORKDIR
 # start group for redirection of output to the logfile
 {
 
-export READ=$(bart show -d1 $meas)
-export SPOKES=$(bart show -d2 $meas) 
-export COILS=$(bart show -d3 $meas)
+OREAD=$(bart show -d1 $meas)
+SPOKES=$(bart show -d2 $meas)
+COILS=$(bart show -d3 $meas)
 
 # perform channel compression
 bart cc -p$VCOILS -A -S $meas meas_cc
@@ -97,16 +98,21 @@ bart cc -p$VCOILS -A -S $meas meas_cc
 # create trajectory 
 if [ $GA -gt 0 ] ; then
     echo "Golden Angle trajectory" >&2
-    bart traj -r -G -c -x$READ -y$SPOKES traj 
+    bart traj -r -G -c -x$OREAD -y$SPOKES traj
 else
     echo "Turn-based trajectory" >&2
-    bart traj -r -c -D -x$READ -y$(($SPOKES / $P)) traj_st
+    bart traj -r -c -D -x$OREAD -y$(($SPOKES / $P)) traj_st
     bart repmat 3 $P traj_st traj_f
-    bart reshape $(bitmask 2 3) $SPOKES 1 traj_f traj
+    bart reshape $(bart bitmask 2 3) $SPOKES 1 traj_f traj
 fi
 
+# remove oversampling
+READ=$(($OREAD / 2))
+bart scale 0.5 traj traj2
+
+
 # apply inverse nufft to full data set
-bart nufft -i -d$READ:$READ:1 traj meas_cc img
+bart nufft -i -d$READ:$READ:1 traj2 meas_cc img
 
 # transform back to k-space and compute sensitivities
 bart fft -u $(bart bitmask 0 1 2) img ksp
@@ -122,22 +128,20 @@ bart delta 16 $(bart bitmask 5 6) $SPOKES eye
 bart fft -i $(bart bitmask 5) eye dftmtx
 bart crop 6 $P dftmtx basis
 
-# generate temporal pattern and apply to raw data 
-bart delta 16 $(bart bitmask 2 5) $SPOKES pattern 
-bart fmac meas_cc pattern meas_t
-bart repmat 1 $READ pattern pattern_full
+# transform data
+bart transpose 2 5 meas_cc meas_t
+bart transpose 2 5 traj2 traj_t
+
+# transform data
+bart transpose 2 5 meas_cc meas_t
+bart transpose 2 5 traj2 traj_t
 
 # reconstruction with subspace constraint
 bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV \
-    -t traj -B basis -p pattern_full meas_t sens reco
+    -t traj_t -B basis meas_t sens reco
 
-#crop to actual FoV and combine coefficients with RSS
-size=$(bc -l <<< "0.5 * $READ")
-bart resize -c 0 $size 1 $size reco reco_cropped 
-bart rss $(bart bitmask 6) reco_cropped $output
-
-#write out reconstruction as png
-bart toimg -W $output $output
+#combine coefficients with RSS
+bart rss $(bart bitmask 6) reco $output
 
 } > $LOGFILE
 
