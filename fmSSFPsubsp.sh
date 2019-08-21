@@ -132,10 +132,6 @@ bart crop 6 $P dftmtx basis
 bart transpose 2 5 meas_cc meas_t
 bart transpose 2 5 traj2 traj_t
 
-# transform data
-bart transpose 2 5 meas_cc meas_t
-bart transpose 2 5 traj2 traj_t
-
 # reconstruction with subspace constraint
 bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV \
     -t traj_t -B basis meas_t sens reco
