@@ -9,6 +9,7 @@ set -e
 
 # default settings
 export PATH=$TOOLBOX_PATH:$PATH
+export BART_COMPAT_VERSION="v0.7.00"
 export VCOILS=10
 export REG=0.0005
 export LLRBLK=8
