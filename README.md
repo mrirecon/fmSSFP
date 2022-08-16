@@ -15,6 +15,7 @@ $ ./fmSSFPsubsp.sh -g0 brain-singleslice-turnbased.cfl reco
 
 will perform the reconstruction and save it as "reco.cfl".
 
+Total runtime of these scripts should be less than a minute.
 
 Try in your browser (no setup required):
 
