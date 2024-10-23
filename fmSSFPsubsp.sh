@@ -80,6 +80,13 @@ if [ ! -e $TOOLBOX_PATH/bart ] ; then
 	exit 1
 fi
 
+# Set legacy FISTA mode
+FISTA_OPTS=""
+if bart pics --interface 2>&1 | grep -q fista_last >/dev/null 2>&1 ; then
+	FISTA_OPTS="--fista_last "
+fi
+
+
 #WORKDIR=$(mktemp -d)
 # Mac: http://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x
 WORKDIR=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
@@ -134,8 +141,7 @@ bart transpose 2 5 meas_cc meas_t
 bart transpose 2 5 traj2 traj_t
 
 # reconstruction with subspace constraint
-bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV \
-    -t traj_t -B basis meas_t sens reco
+bart pics -SeH -d5 -R L:3:3:$REG -i$ITER -f$FOV $FISTA_OPTS -t traj_t -B basis meas_t sens reco
 
 #combine coefficients with RSS
 bart rss $(bart bitmask 6) reco $output
