@@ -1,3 +1,9 @@
+
+**Main repository has moved to: https://gitlab.tugraz.at/ibi/mrirecon/papers/fmssfp**
+
+**Please check there for updates.**
+
+
 # fmSSFP
 bash script and demo data for subspace-constrained fmSSFP reconstruction
 
